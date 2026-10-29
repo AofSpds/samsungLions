@@ -1,0 +1,15 @@
+# Local settings and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Generated development files
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
