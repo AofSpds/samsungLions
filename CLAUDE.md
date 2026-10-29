@@ -1,10 +1,13 @@
-# Claude용 작업 안내
+# SamsungLions — Claude Code 진입 지침
 
-이 저장소에서 작업하기 전에 **[AGENTS.md](AGENTS.md)**를 읽고 공통 규칙을 따르세요.
+Claude Code는 다음 `@path` 가져오기로 공통 맥락을 읽습니다. 실제 세션 훅은 `.claude/settings.json`에 별도로 있습니다.
 
-- 프로젝트 작업: `projects/<프로젝트명>/CURRENT.md`와 관련 `board/` 문서를 먼저 확인합니다.
-- 창작물 작업: `works/`에 결과물을 보관하고 프로젝트 문서에 경로를 연결합니다.
-- 앱·스킬 작업: 실제 필요할 때만 `apps/` 하위에 생성합니다.
-- 사람의 합의 없이 프로젝트의 구조·권한·기존 자료를 일괄 변경하지 않습니다.
+@AGENTS.md
+@domain/CONTEXT.md
+@domain/ROLES.md
+@domain/PROJECTS.md
+@STATUS.md
 
-이 파일은 진입 안내이며, 공통 규칙의 정본은 `AGENTS.md`입니다.
+- 현재 역할 및 프로젝트는 세션에서 명시적으로 지정된 경우에만 배정된 것으로 취급합니다.
+- 새 세션·재개·압축·포크 및 서브에이전트 시작에서 `[SL-CONTEXT]` 표식과 선택된 역할·프로젝트를 확인합니다.
+- 훅이 지원되지 않는 웹 환경에서는 [웹 시작 패킷](domain/WEB_BOOTSTRAP.md)을 사용해 정본 문서를 직접 읽습니다.

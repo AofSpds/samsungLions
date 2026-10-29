@@ -1,0 +1,32 @@
+{
+  "description": "Read-only SamsungLions domain, role, and project context on session/subagent starts",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact|fork",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/scripts/context_bootstrap.py\" --hook",
+            "commandWindows": "python (Join-Path (git rev-parse --show-toplevel) 'scripts/context_bootstrap.py') --hook",
+            "timeout": 10,
+            "additionalContextLimit": 50000
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/scripts/context_bootstrap.py\" --hook",
+            "commandWindows": "python (Join-Path (git rev-parse --show-toplevel) 'scripts/context_bootstrap.py') --hook",
+            "timeout": 10,
+            "additionalContextLimit": 50000
+          }
+        ]
+      }
+    ]
+  }
+}
