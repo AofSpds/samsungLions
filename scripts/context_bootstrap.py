@@ -94,8 +94,18 @@ def build_context(
     root = root.resolve()
     env = os.environ if environment is None else environment
     cwd_project, cwd_role = _from_cwd(root, cwd)
-    project = _name(project or env.get("SL_PROJECT") or cwd_project, "project")
-    role = _name(role or env.get("SL_ROLE") or cwd_role, "role")
+    env_project = _name(env.get("SL_PROJECT"), "project")
+    env_role = _name(env.get("SL_ROLE"), "role")
+    if project is None and env_project and cwd_project and env_project != cwd_project:
+        raise ContextError(
+            f"Project selection conflict: environment={env_project}, directory={cwd_project}"
+        )
+    if role is None and env_role and cwd_role and env_role != cwd_role:
+        raise ContextError(
+            f"Role selection conflict: environment={env_role}, directory={cwd_role}"
+        )
+    project = _name(project or env_project or cwd_project, "project")
+    role = _name(role or env_role or cwd_role, "role")
 
     documents: list[tuple[str, str]] = [(path, _read(root, path)) for path in BASE_DOCS]
     registered = _registered_projects(dict(documents)["domain/PROJECTS.md"])

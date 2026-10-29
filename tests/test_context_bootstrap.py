@@ -59,6 +59,41 @@ class ContextTests(unittest.TestCase):
             (project_dir / "CURRENT.md").write_text("# Updated", encoding="utf-8")
             self.assertNotEqual(original, cb.build_context(root, project="demo", environment={})["digest"])
 
+    def test_selection_conflicts_are_rejected(self):
+        with self.assertRaisesRegex(cb.ContextError, "Project selection conflict"):
+            cb.build_context(
+                REPO,
+                cwd=REPO / "projects/album/roles/pln",
+                environment={"SL_PROJECT": "education"},
+            )
+        with self.assertRaisesRegex(cb.ContextError, "Role selection conflict"):
+            cb.build_context(
+                REPO,
+                cwd=REPO / "projects/album/roles/pln",
+                environment={"SL_ROLE": "pmo"},
+            )
+
+    def test_registry_and_hooks_are_consistent(self):
+        registered = cb._registered_projects(
+            (REPO / "domain/PROJECTS.md").read_text(encoding="utf-8")
+        )
+        local_projects = {
+            path.name for path in (REPO / "projects").iterdir()
+            if path.is_dir() and not path.name.startswith(".")
+        }
+        self.assertEqual(registered, local_projects)
+        for project in registered:
+            for filename in cb.PROJECT_DOCS:
+                self.assertTrue((REPO / "projects" / project / filename).is_file())
+        for filename in (".claude/settings.json", ".codex/hooks.json"):
+            data = json.loads((REPO / filename).read_text(encoding="utf-8"))
+            self.assertIn("SessionStart", data["hooks"])
+            self.assertIn("SubagentStart", data["hooks"])
+            group = data["hooks"]["SessionStart"][0]
+            for trigger in ("startup", "resume", "compact", "clear", "fork"):
+                self.assertIn(trigger, group["matcher"])
+            self.assertIn("context_bootstrap.py", group["hooks"][0]["command"])
+
     def test_hook_json(self):
         payload = json.dumps({"hook_event_name": "SubagentStart", "cwd": str(REPO)})
         call = subprocess.run(
