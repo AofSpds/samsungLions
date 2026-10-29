@@ -1,0 +1,50 @@
+name: SamsungLions context contract
+
+on:
+  push:
+    paths:
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'STATUS.md'
+      - 'domain/**'
+      - 'projects/**'
+      - 'scripts/context_bootstrap.py'
+      - 'tests/test_context_bootstrap.py'
+      - '.claude/settings.json'
+      - '.codex/hooks.json'
+      - '.github/workflows/context-check.yml'
+  pull_request:
+    paths:
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'STATUS.md'
+      - 'domain/**'
+      - 'projects/**'
+      - 'scripts/context_bootstrap.py'
+      - 'tests/test_context_bootstrap.py'
+      - '.claude/settings.json'
+      - '.codex/hooks.json'
+      - '.github/workflows/context-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out workspace
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate global context
+        run: python scripts/context_bootstrap.py --check
+      - name: Run offline context tests
+        run: python -m unittest discover -s tests -v
+      - name: Validate runtime hook configuration
+        run: |
+          python -m json.tool .claude/settings.json > /dev/null
+          python -m json.tool .codex/hooks.json > /dev/null
